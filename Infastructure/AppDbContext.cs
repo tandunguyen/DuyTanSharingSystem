@@ -1,0 +1,515 @@
+﻿
+
+namespace Infrastructure
+{
+
+    public class AppDbContext : DbContext
+    {
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Post> Posts { get; set; } 
+        public DbSet<Like> Likes { get; set; }
+        public DbSet<Comment> Comments { get; set; }
+        public DbSet<CommentLike> CommentLikes { get; set; }
+        public DbSet<Share> Shares { get; set; }
+        public DbSet<Friendship> Friendships { get; set; }
+        public DbSet<Domain.Entities.Group> Groups { get; set; }
+        public DbSet<GroupMember> GroupMembers { get; set; }
+        public DbSet<Message> Messages { get; set; }
+        public DbSet<Report> Reports { get; set; }
+        public DbSet<StudyMaterial> StudyMaterials { get; set; }
+        public DbSet<EmailVerificationToken> emailVerificationTokens { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<Conversation> Conversations { get; set; } // Thêm DbSet cho Conversation
+        public DbSet<Notification> Notifications { get; set; } // Thêm DbSet cho Notification
+
+        //huy
+        public DbSet<RidePost> RidePosts { get; set; }
+        public DbSet<Ride> Rides { get; set; }
+        public DbSet<LocationUpdate> LocationUpdates { get; set; }
+        public DbSet<RideReport> RideReports { get; set; }
+        public DbSet<Rating> Ratings { get; set; }
+        public DbSet<AIConversation> AIConversations { get; set; }
+        public DbSet<AIChatHistory> AIChatHistories { get; set; }
+
+        public DbSet<UserScoreHistory> UserScoreHistories { get; set; }
+        // thanh       
+        public DbSet<UserReport> UserReports { get; set; }
+        public DbSet<UserAction> UserActions { get; set; }
+
+        //trọ
+        public DbSet<AccommodationPost> AccommodationPosts { get; set; }
+        public DbSet<AccommodationReview> AccommodationReviews { get; set; }
+        public DbSet<Roommate> Roommates { get; set; }
+        //tài liệu
+        public DbSet<StudyMaterialRating> StudyMaterialRatings { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            // Khóa chính
+            modelBuilder.Entity<User>().HasKey(u => u.Id);
+            modelBuilder.Entity<Post>().HasKey(p => p.Id);
+            modelBuilder.Entity<Like>().HasKey(l => l.Id);
+            modelBuilder.Entity<Comment>().HasKey(c => c.Id);
+            modelBuilder.Entity<Share>().HasKey(s => s.Id);
+            modelBuilder.Entity<Friendship>().HasKey(f => f.Id);
+            modelBuilder.Entity<Domain.Entities.Group>().HasKey(g => g.Id);
+            modelBuilder.Entity<GroupMember>().HasKey(gm => gm.Id);
+            modelBuilder.Entity<Report>().HasKey(r => r.Id);
+            modelBuilder.Entity<StudyMaterial>().HasKey(sm => sm.Id);
+            modelBuilder.Entity<EmailVerificationToken>().HasKey(e => e.Id);
+            modelBuilder.Entity<RefreshToken>().HasKey(r => r.Id);
+            //huy
+            modelBuilder.Entity<RidePost>().HasKey(rp => rp.Id);
+            modelBuilder.Entity<Ride>().HasKey(r => r.Id);
+            modelBuilder.Entity<LocationUpdate>().HasKey(lu => lu.Id);
+            modelBuilder.Entity<RideReport>().HasKey(rr => rr.Id);
+            modelBuilder.Entity<Rating>().HasKey(r => r.Id);
+            modelBuilder.Entity<Conversation>().HasKey(c => c.Id);
+            modelBuilder.Entity<Message>().HasKey(c => c.Id);
+            modelBuilder.Entity<Notification>().HasKey(n => n.Id);
+            modelBuilder.Entity<AIConversation>().HasKey(a => a.Id);
+            modelBuilder.Entity<AIChatHistory>().HasKey(a => a.Id);
+
+            //chups
+            modelBuilder.Entity<UserScoreHistory>().HasKey(ush => ush.Id);
+            
+            //thanh
+            modelBuilder.Entity<UserAction>().HasKey(ua => ua.Id);
+            modelBuilder.Entity<UserReport>().HasKey(ur  =>ur.Id);
+
+            //trọ
+            modelBuilder.Entity<AccommodationPost>().HasKey(ap => ap.Id);
+            modelBuilder.Entity<AccommodationReview>().HasKey(ar => ar.Id);
+            modelBuilder.Entity<Roommate>().HasKey(rm => rm.Id);
+            //tài liệu
+            modelBuilder.Entity<StudyMaterialRating>().HasKey(smr => smr.Id);
+            modelBuilder.Entity<StudyMaterial>().HasKey(sm => sm.Id);
+
+            //Dùng HasQueryFilter để tự động loại bỏ dữ liệu đã bị xóa mềm (IsDeleted = true) khi truy vấn.
+            //Nếu không sử dụng, cần phải thêm điều kiện IsDeleted = false trong mỗi truy vấn.
+            modelBuilder.Entity<Post>().HasQueryFilter(p => !p.IsDeleted);
+            modelBuilder.Entity<Comment>().HasQueryFilter(c => !c.IsDeleted);
+            modelBuilder.Entity<Like>().HasQueryFilter(l => !l.IsDeleted);
+            modelBuilder.Entity<Share>().HasQueryFilter(s => !s.IsDeleted);
+            modelBuilder.Entity<Report>().HasQueryFilter(p => !p.IsDeleted);
+
+
+            // Cấu hình quan hệ
+            modelBuilder.Entity<Post>()
+                .HasOne(p => p.User)
+                .WithMany(u => u.Posts)
+                .HasForeignKey(p => p.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<RideReport>()
+                .HasOne(r => r.Passenger)
+                .WithMany(u => u.RideReports) 
+                .HasForeignKey(r => r.PassengerId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<RideReport>()
+                .HasOne(rr => rr.Ride)
+                .WithMany(r => r.RideReports)
+                .HasForeignKey(rr => rr.RideId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Like>()
+                .HasOne(l => l.User)
+                .WithMany(u => u.Likes)
+                .HasForeignKey(l => l.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Like>()
+                .HasOne(l => l.Post)
+                .WithMany(p => p.Likes)
+                .HasForeignKey(l => l.PostId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Comment>()
+                .HasOne(c => c.User)
+                .WithMany(u => u.Comments)
+                .HasForeignKey(c => c.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Comment>()
+                .HasOne(c => c.Post)
+                .WithMany(p => p.Comments)
+                .HasForeignKey(c => c.PostId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Friendship>()
+                .HasOne<User>()
+                .WithMany(u => u.SentFriendRequests)
+                .HasForeignKey(f => f.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Friendship>()
+                .HasOne<User>()
+                .WithMany(u => u.ReceivedFriendRequests)
+                .HasForeignKey(f => f.FriendId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Report>(entity =>
+            {
+                // Cấu hình quan hệ với Post
+                entity.HasOne(r => r.Post)
+                      .WithMany(p => p.Reports) // Một Post có nhiều Reports
+                      .HasForeignKey(r => r.PostId)
+                      .OnDelete(DeleteBehavior.Cascade); // Xóa Report khi Post bị xóa
+
+                // Cấu hình quan hệ với User (người báo cáo)
+                entity.HasOne(r => r.ReportedByUser)
+                      .WithMany(u => u.Reports) // Một User có thể báo cáo nhiều Post
+                      .HasForeignKey(r => r.ReportedBy)
+                      .OnDelete(DeleteBehavior.Restrict); // Không cho xóa User nếu có Report
+            });
+
+            modelBuilder.Entity<GroupMember>()
+                .HasOne<Domain.Entities.Group>()
+                .WithMany(g => g.GroupMembers)
+                .HasForeignKey(gm => gm.GroupId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<GroupMember>()
+                .HasOne<User>()
+                .WithMany(u => u.GroupMembers)
+                .HasForeignKey(gm => gm.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<EmailVerificationToken>()
+                .HasOne<User>()
+                .WithMany()
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<RefreshToken>()
+                .HasOne<User>()
+                .WithMany()
+                .HasForeignKey(r => r.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            //CHUPS
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.Posts)  // Một User có nhiều Posts
+                .WithOne(p => p.User)   // Một Post chỉ thuộc về một User
+                .HasForeignKey(p => p.UserId)
+                .OnDelete(DeleteBehavior.Cascade); // Khi User bị xóa, xóa luôn Posts của họ
+                                                   // Cấu hình quan hệ Post - Likes
+
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.UserScoreHistories)
+                .WithOne(p => p.User)
+                .HasForeignKey(p => p.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Post>()
+                .HasMany(p => p.Likes)
+                .WithOne(l => l.Post)
+                .HasForeignKey(l => l.PostId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Post>()
+                .HasMany(p => p.Reports)
+                .WithOne(l => l.Post)
+                .HasForeignKey(l => l.PostId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+
+            // Cấu hình quan hệ Post - Comments
+            modelBuilder.Entity<Post>()
+                .HasMany(p => p.Comments)
+                .WithOne(c => c.Post)
+                .HasForeignKey(c => c.PostId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Cấu hình quan hệ Post - Shares
+            modelBuilder.Entity<Post>()
+                .HasMany(p => p.Shares)
+                .WithOne(s => s.Post)
+                .HasForeignKey(s => s.PostId)
+                .OnDelete(DeleteBehavior.Cascade);
+            // Quan hệ 1 User - N Share
+            modelBuilder.Entity<Share>()
+                .HasOne(s => s.User)
+                .WithMany(u => u.Shares)
+                .HasForeignKey(s => s.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Quan hệ 1 Post - N Share
+            modelBuilder.Entity<Share>()
+                .HasOne(s => s.Post)
+                .WithMany(p => p.Shares)
+                .HasForeignKey(s => s.PostId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // 🔥 Thiết lập quan hệ comment cha - comment con
+            modelBuilder.Entity<Comment>()
+                .HasOne(c => c.ParentComment)
+                .WithMany(c => c.Replies)
+                .HasForeignKey(c => c.ParentCommentId)
+                .OnDelete(DeleteBehavior.Restrict); // Tránh lỗi vòng lặp
+                                                    // 🔥 Thiết lập quan hệ like comment
+            modelBuilder.Entity<CommentLike>()
+                .HasKey(cl => new { cl.UserId, cl.CommentId }); // Đảm bảo 1 user chỉ like 1 lần
+
+            modelBuilder.Entity<CommentLike>()
+                .HasOne(cl => cl.User)
+                .WithMany(u => u.CommentLikes)
+                .HasForeignKey(cl => cl.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<CommentLike>()
+                .HasOne(cl => cl.Comment)
+                .WithMany(c => c.CommentLikes)
+                .HasForeignKey(cl => cl.CommentId);
+
+            //huy
+            // 1. Quan hệ 1 User - N RidePost
+            modelBuilder.Entity<RidePost>()
+                .HasOne(rp => rp.User)
+                .WithMany(u => u.RidePosts)
+                .HasForeignKey(rp => rp.UserId)
+                .OnDelete(DeleteBehavior.Cascade); // Khi User bị xóa, RidePost cũng bị xóa
+
+            // 2. Quan hệ 1 RidePost - 1 Ride (1 bài đăng chỉ có thể tạo ra 1 chuyến đi)
+            modelBuilder.Entity<Ride>()
+                .HasOne(r => r.RidePost)
+                .WithOne(rp => rp.Ride)
+                .HasForeignKey<Ride>(r => r.RidePostId)
+                .OnDelete(DeleteBehavior.Cascade); // Nếu RidePost bị xóa, Ride cũng bị xóa
+
+            // 3. Quan hệ 1 User - N Rides (tài xế có thể có nhiều chuyến đi)
+            modelBuilder.Entity<Ride>()
+                .HasOne(r => r.Driver)
+                .WithMany(u => u.DrivenRides)
+                .HasForeignKey(r => r.DriverId)
+                .OnDelete(DeleteBehavior.Restrict); // Không cho phép xóa tài xế nếu còn chuyến đi
+
+            // 4. Quan hệ 1 User - N Rides (hành khách có thể có nhiều chuyến đi)
+            modelBuilder.Entity<Ride>()
+                .HasOne(r => r.Passenger)
+                .WithMany(u => u.RidesAsPassenger)
+                .HasForeignKey(r => r.PassengerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // 5. Quan hệ 1 User - N LocationUpdates (mỗi user có thể cập nhật nhiều vị trí)
+            modelBuilder.Entity<LocationUpdate>()
+                .HasOne(l => l.User)
+                .WithMany(u => u.LocationUpdates)
+                .HasForeignKey(l => l.RideId)
+
+                .OnDelete(DeleteBehavior.Cascade);
+            // 6. Quan hệ 1 Ride - N LocationUpdates (mỗi chuyến đi có thể có nhiều cập nhật vị trí)
+            modelBuilder.Entity<LocationUpdate>()
+                .HasOne(l => l.Ride)
+                .WithMany(r => r.LocationUpdates)
+                .HasForeignKey(l => l.RideId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            //THANH LE
+                modelBuilder.Entity<Report>()
+              .HasOne(r => r.Post)
+              .WithMany(p => p.Reports)
+              .HasForeignKey(r => r.PostId)
+              .OnDelete(DeleteBehavior.Cascade); // Khi xóa Post sẽ xóa các Report liên quan
+
+            // 2. Quan hệ: User (1) - (n) Report (người báo cáo)
+            modelBuilder.Entity<Report>()
+                .HasOne(r => r.ReportedByUser)
+                .WithMany() // Nếu bạn muốn thêm User.Reports thì thay bằng `.WithMany(u => u.Reports)`
+                .HasForeignKey(r => r.ReportedBy)
+                .OnDelete(DeleteBehavior.Restrict); // Tránh xóa user kéo theo mất report
+
+            modelBuilder.Entity<User>()
+              .HasMany(u => u.Reports) 
+              .WithOne(p => p.ReportedByUser) 
+              .HasForeignKey(p => p.ReportedBy)
+              .OnDelete(DeleteBehavior.Cascade);
+
+           
+
+            //message
+            // Cấu hình Conversation
+            modelBuilder.Entity<Conversation>()
+                .HasKey(c => c.Id);
+
+            modelBuilder.Entity<Conversation>()
+                .Property(c => c.CreatedAt)
+                .HasDefaultValueSql("GETDATE()");
+
+            modelBuilder.Entity<Conversation>()
+                .HasIndex(c => new { c.User1Id, c.User2Id })
+                .IsUnique();
+
+            modelBuilder.Entity<Conversation>()
+                .HasOne(c => c.User1)
+                .WithMany(u => u.ConversationsAsUser1)
+                .HasForeignKey(c => c.User1Id) // Rõ ràng ánh xạ User1Id
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Conversation>()
+                .HasOne(c => c.User2)
+                .WithMany(u => u.ConversationsAsUser2)
+                .HasForeignKey(c => c.User2Id) // Rõ ràng ánh xạ User2Id
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Cấu hình Message
+            modelBuilder.Entity<Message>()
+                .HasKey(m => m.Id);
+
+            modelBuilder.Entity<Message>()
+                .Property(m => m.SentAt)
+                .HasColumnType("datetime2")
+                .HasDefaultValueSql("GETDATE()");
+
+            modelBuilder.Entity<Message>()
+                .Property(m => m.IsSeen)
+                .HasDefaultValue(false);
+
+            modelBuilder.Entity<Message>()
+                .Property(m => m.SeenAt)
+                .HasColumnType("datetime2");
+
+            modelBuilder.Entity<Message>()
+                .HasOne(m => m.Conversation)
+                .WithMany(c => c.Messages)
+                .HasForeignKey(m => m.ConversationId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Message>()
+                .HasOne(m => m.Sender)
+                .WithMany(u => u.SentMessages)
+                .HasForeignKey(m => m.SenderId) // Rõ ràng ánh xạ SenderId
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Message>()
+                .Property(m => m.SenderId)
+                .HasColumnName("SenderId"); // Rõ ràng tên cột trong DB
+            //notification
+            modelBuilder.Entity<Notification>()
+                .HasKey(n => n.Id);
+
+            modelBuilder.Entity<Notification>()
+                .HasOne(n => n.Receiver)
+                .WithMany(u => u.ReceivedNotifications)
+                .HasForeignKey(n => n.ReceiverId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+            modelBuilder.Entity<Notification>()
+                .HasOne(n => n.Sender)
+                .WithMany(u => u.SentNotifications)
+                .HasForeignKey(n => n.SenderId)
+                .OnDelete(DeleteBehavior.Restrict);
+            //chat AI
+            modelBuilder.Entity<AIConversation>()
+                .HasMany(c => c.ChatHistories)
+                .WithOne()
+                .HasForeignKey(ch => ch.ConversationId);
+
+            modelBuilder.Entity<AIConversation>()
+                .HasIndex(c => new { c.UserId, c.CreatedAt })
+                .HasDatabaseName("IX_Conversations_UserId_CreatedAt");
+
+            modelBuilder.Entity<AIChatHistory>()
+                .HasIndex(ch => new { ch.ConversationId, ch.Timestamp })
+                .HasDatabaseName("IX_ChatHistories_ConversationId_Timestamp");
+            // Quan hệ 1-n: User - AIConversations
+            modelBuilder.Entity<AIConversation>()
+                .HasOne(c => c.User)
+                .WithMany(u => u.AIConversations)
+                .HasForeignKey(c => c.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            // Quan hệ 1-n: AIConversation - ChatHistories
+            modelBuilder.Entity<AIChatHistory>()
+                .HasOne(ch => ch.AIConversation)
+                .WithMany(c => c.ChatHistories)
+                .HasForeignKey(ch => ch.ConversationId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<UserScoreHistory>()
+                .HasOne(ush => ush.User)
+                .WithMany(u => u.UserScoreHistories)
+                .HasForeignKey(ush => ush.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Quan hệ 1 User - N UserReports (người bị báo cáo)
+            modelBuilder.Entity<UserReport>()
+                .HasOne(ur => ur.ReportedUser)
+                .WithMany(u => u.UserReports)
+                .HasForeignKey(ur => ur.ReportedUserId)
+                .OnDelete(DeleteBehavior.Restrict); // Không xóa User nếu còn báo cáo
+
+            // Quan hệ 1 User - N UserReports (người báo cáo)
+            modelBuilder.Entity<UserReport>()
+                .HasOne(ur => ur.ReportedByUser)
+                .WithMany(u => u.UserReportsCreated)
+                .HasForeignKey(ur => ur.ReportedByUserId)
+                .OnDelete(DeleteBehavior.Restrict); // Không xóa User nếu còn báo cáo
+
+            // Quan hệ 1 User - N UserActions
+            modelBuilder.Entity<UserAction>()
+                .HasOne(ua => ua.User)
+                .WithMany(u => u.UserActions)
+                .HasForeignKey(ua => ua.UserId)
+                .OnDelete(DeleteBehavior.Cascade); // Xóa hành động khi xóa user (tùy chính sách)
+            modelBuilder.Entity<Rating>()
+                .HasOne(r => r.User)
+                .WithMany()
+                .HasForeignKey(r => r.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Rating>()
+                .HasOne(r => r.RatedByUser)
+                .WithMany()
+                .HasForeignKey(r => r.RatedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+            //trọ
+            modelBuilder.Entity<AccommodationPost>()
+                .HasOne(ap => ap.User)
+                .WithMany(u => u.AccommodationPosts)
+                .HasForeignKey(ap => ap.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<AccommodationReview>()
+                .HasOne(ar => ar.AccommodationPost)
+                .WithMany(ap => ap.Reviews)
+                .HasForeignKey(ar => ar.AccommodationPostId)
+                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<AccommodationPost>()
+                .HasMany(ap => ap.Reviews)
+                .WithOne(ar => ar.AccommodationPost)
+                .HasForeignKey(ar => ar.AccommodationPostId)
+                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<AccommodationReview>()
+                .HasOne(ar => ar.User)
+                .WithMany(u => u.AccommodationReviews)
+                .HasForeignKey(ar => ar.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<AccommodationPost>()
+                .HasMany(ap => ap.Roommates)
+                .WithOne(rm => rm.AccommodationPost)
+                .HasForeignKey(rm => rm.AccommodationPostId)
+                .OnDelete(DeleteBehavior.Cascade);
+            //tài liệu
+            modelBuilder.Entity<StudyMaterialRating>()
+                .HasOne(smr => smr.Material)
+                .WithMany(sm => sm.Ratings)
+                .HasForeignKey(smr => smr.MaterialId)
+                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<StudyMaterialRating>()
+                .HasOne(smr => smr.User)
+                .WithMany(u => u.StudyMaterialRatings)
+                .HasForeignKey(smr => smr.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<StudyMaterial>()
+                .HasOne(sm => sm.User)
+                .WithMany(u => u.StudyMaterials)
+                .HasForeignKey(sm => sm.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<StudyMaterial>()
+                .HasMany(sm => sm.Ratings)
+                .WithOne(smr => smr.Material)
+                .HasForeignKey(smr => smr.MaterialId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+
+        }
+    }
+}

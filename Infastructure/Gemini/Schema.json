@@ -1,0 +1,347 @@
+﻿[
+  {
+    "TableName": "Users",
+    "Description": "Thông tin người dùng (user account)",
+    "Columns": [
+      {
+        "Name": "Id",
+        "SqlType": "uniqueidentifier",
+        "DotNetType": "Guid",
+        "IsPrimaryKey": true,
+        "IsNullable": false
+      },
+      {
+        "Name": "FullName",
+        "SqlType": "nvarchar(100)",
+        "DotNetType": "string",
+        "IsNullable": false
+      },
+      {
+        "Name": "Email",
+        "SqlType": "nvarchar(100)",
+        "DotNetType": "string",
+        "IsUnique": true,
+        "IsNullable": false
+      },
+      {
+        "Name": "PasswordHash",
+        "SqlType": "nvarchar(255)",
+        "DotNetType": "string",
+        "IsNullable": false
+      },
+      {
+        "Name": "ProfilePicture",
+        "SqlType": "nvarchar(255)",
+        "DotNetType": "string",
+        "IsNullable": true
+      },
+      {
+        "Name": "Bio",
+        "SqlType": "nvarchar(255)",
+        "DotNetType": "string",
+        "IsNullable": true
+      },
+      {
+        "Name": "CreatedAt",
+        "SqlType": "datetime",
+        "DotNetType": "DateTime",
+        "IsNullable": false
+      },
+      {
+        "Name": "IsVerifiedEmail",
+        "SqlType": "bit",
+        "DotNetType": "bool",
+        "Default": "0 (false)",
+        "IsNullable": false
+      },
+      {
+        "Name": "TrustScore",
+        "SqlType": "decimal(10, 2)",
+        "DotNetType": "decimal",
+        "IsNullable": true
+      },
+      {
+        "Name": "Role",
+        "SqlType": "int",
+        "DotNetType": "int",
+        "IsNullable": true
+      },
+      {
+        "Name": "Phone",
+        "SqlType": "varchar(20)",
+        "DotNetType": "string",
+        "IsNullable": true
+      },
+      {
+        "Name": "UpdatedAt",
+        "SqlType": "datetime",
+        "DotNetType": "DateTime",
+        "IsNullable": true
+      },
+      {
+        "Name": "Gender",
+        "SqlType": "nvarchar(10)",
+        "DotNetType": "string",
+        "IsNullable": true
+      },
+      {
+        "Name": "Status",
+        "SqlType": "nvarchar(50)",
+        "DotNetType": "string",
+        "Default": "'Active'",
+        "IsNullable": false
+      },
+      {
+        "Name": "TotalReports",
+        "SqlType": "int",
+        "DotNetType": "int",
+        "Default": "0",
+        "IsNullable": false
+      }
+    ],
+    "Relationships": [
+      {
+        "TargetTable": "AccommodationPosts",
+        "SourceColumn": "Id",
+        "TargetColumn": "UserId",
+        "RelationshipType": "One-to-Many",
+        "NavigationName": "Posts"
+      },
+      {
+        "TargetTable": "AccommodationReviews",
+        "SourceColumn": "Id",
+        "TargetColumn": "UserId",
+        "RelationshipType": "One-to-Many",
+        "NavigationName": "Reviews"
+      }
+    ]
+  },
+  {
+    "TableName": "AccommodationPosts",
+    "Description": "Bài đăng cho thuê phòng trọ",
+    "Columns": [
+      {
+        "Name": "Id",
+        "SqlType": "uniqueidentifier",
+        "DotNetType": "Guid",
+        "IsPrimaryKey": true,
+        "IsNullable": false
+      },
+      {
+        "Name": "UserId",
+        "SqlType": "uniqueidentifier",
+        "DotNetType": "Guid",
+        "IsForeignKey": true,
+        "References": "Users",
+        "IsNullable": false
+      },
+      {
+        "Name": "Title",
+        "SqlType": "nvarchar(255)",
+        "DotNetType": "string",
+        "IsNullable": false
+      },
+      {
+        "Name": "Content",
+        "SqlType": "nvarchar(max)",
+        "DotNetType": "string",
+        "IsNullable": true
+      },
+      {
+        "Name": "Address",
+        "SqlType": "nvarchar(500)",
+        "DotNetType": "string",
+        "IsNullable": false
+      },
+      {
+        "Name": "Latitude",
+        "SqlType": "float",
+        "DotNetType": "double",
+        "IsNullable": false
+      },
+      {
+        "Name": "Longitude",
+        "SqlType": "float",
+        "DotNetType": "double",
+        "IsNullable": false
+      },
+      {
+        "Name": "Price",
+        "SqlType": "decimal(18, 2)",
+        "DotNetType": "decimal",
+        "IsNullable": false
+      },
+      {
+        "Name": "Area",
+        "SqlType": "decimal(10, 2)",
+        "DotNetType": "decimal",
+        "IsNullable": true
+      },
+      {
+        "Name": "RoomType",
+        "SqlType": "nvarchar(50)",
+        "DotNetType": "string",
+        "IsNullable": true
+      },
+      {
+        "Name": "Amenities",
+        "SqlType": "nvarchar(max)",
+        "DotNetType": "string",
+        "IsNullable": true
+      },
+      {
+        "Name": "Status",
+        "SqlType": "int",
+        "DotNetType": "int",
+        "Description": "0: Đang tìm, 1: Đã thuê, 2: Ẩn",
+        "IsNullable": false
+      },
+      {
+        "Name": "IsVerified",
+        "SqlType": "bit",
+        "DotNetType": "bool",
+        "IsNullable": true
+      },
+      {
+        "Name": "CreatedAt",
+        "SqlType": "datetime2(7)",
+        "DotNetType": "DateTime",
+        "IsNullable": false
+      },
+      {
+        "Name": "UpdatedAt",
+        "SqlType": "datetime2(7)",
+        "DotNetType": "DateTime",
+        "IsNullable": true
+      },
+      {
+        "Name": "IsDelete",
+        "SqlType": "bit",
+        "DotNetType": "bool",
+        "Default": "0 (false)",
+        "IsNullable": false
+      },
+      {
+        "Name": "MaxPeople",
+        "SqlType": "int",
+        "DotNetType": "int",
+        "IsNullable": true
+      },
+      {
+        "Name": "CurrentPeople",
+        "SqlType": "int",
+        "DotNetType": "int",
+        "IsNullable": true
+      }
+    ],
+    "Relationships": [
+      {
+        "SourceColumn": "UserId",
+        "TargetTable": "Users",
+        "TargetColumn": "Id",
+        "RelationshipType": "Many-to-One",
+        "NavigationName": "User"
+      },
+      {
+        "TargetTable": "AccommodationReviews",
+        "SourceColumn": "Id",
+        "TargetColumn": "AccommodationPostId",
+        "RelationshipType": "One-to-Many",
+        "NavigationName": "Reviews"
+      }
+    ]
+  },
+  {
+    "TableName": "AccommodationReviews",
+    "Description": "Đánh giá phòng trọ",
+    "Columns": [
+      {
+        "Name": "Id",
+        "SqlType": "uniqueidentifier",
+        "DotNetType": "Guid",
+        "IsPrimaryKey": true,
+        "IsNullable": false
+      },
+      {
+        "Name": "AccommodationPostId",
+        "SqlType": "uniqueidentifier",
+        "DotNetType": "Guid",
+        "IsForeignKey": true,
+        "References": "AccommodationPosts",
+        "IsNullable": false
+      },
+      {
+        "Name": "UserId",
+        "SqlType": "uniqueidentifier",
+        "DotNetType": "Guid",
+        "IsForeignKey": true,
+        "References": "Users",
+        "IsNullable": false
+      },
+      {
+        "Name": "Rating",
+        "SqlType": "int",
+        "DotNetType": "int",
+        "Range": "1-5",
+        "IsNullable": false
+      },
+      {
+        "Name": "Comment",
+        "SqlType": "nvarchar(max)",
+        "DotNetType": "string",
+        "IsNullable": true
+      },
+      {
+        "Name": "SafetyScore",
+        "SqlType": "int",
+        "DotNetType": "int",
+        "Range": "1-5",
+        "IsNullable": true
+      },
+      {
+        "Name": "PriceScore",
+        "SqlType": "int",
+        "DotNetType": "int",
+        "Range": "1-5",
+        "IsNullable": true
+      },
+      {
+        "Name": "CreatedAt",
+        "SqlType": "datetime2(7)",
+        "DotNetType": "DateTime",
+        "IsNullable": false
+      },
+      {
+        "Name": "IsApproved",
+        "SqlType": "bit",
+        "DotNetType": "bool",
+        "Default": "0 (false)",
+        "IsNullable": false
+      },
+      {
+        "Name": "IsDelete",
+        "SqlType": "bit",
+        "DotNetType": "bool",
+        "Default": "0 (false)",
+        "IsNullable": false
+      }
+    ],
+    "Relationships": [
+      {
+        "SourceColumn": "AccommodationPostId",
+        "TargetTable": "AccommodationPosts",
+        "TargetColumn": "Id",
+        "RelationshipType": "Many-to-One",
+        "OnDelete": "CASCADE",
+        "NavigationName": "AccommodationPost"
+      },
+      {
+        "SourceColumn": "UserId",
+        "TargetTable": "Users",
+        "TargetColumn": "Id",
+        "RelationshipType": "Many-to-One",
+        "NavigationName": "User"
+      }
+    ]
+  }
+]
